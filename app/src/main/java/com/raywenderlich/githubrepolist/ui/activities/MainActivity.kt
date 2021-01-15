@@ -37,16 +37,35 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.githubrepolist.R
-import com.raywenderlich.githubrepolist.data.Request
+import com.raywenderlich.githubrepolist.api.RepositoryRetriever
+import com.raywenderlich.githubrepolist.data.RepoResult
 import com.raywenderlich.githubrepolist.ui.adapters.RepoListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 class MainActivity : Activity() {
+
+  private val repoRetriever = RepositoryRetriever()
+
+  private val callback = object: Callback<RepoResult> {
+    override fun onFailure(call: Call<RepoResult>, t: Throwable) {
+      Log.e("MainActivity", "Problem calling Github API {${t?.message}}")
+    }
+
+    override fun onResponse(call: Call<RepoResult>, response: Response<RepoResult>) {
+      response?.isSuccessful.let {
+        val resultList = RepoResult(response?.body()?.items ?: emptyList())
+        repoList.adapter = RepoListAdapter(resultList)
+      }
+    }
+  }
 
   @RequiresApi(Build.VERSION_CODES.M)
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,12 +78,7 @@ class MainActivity : Activity() {
     val url = "https://api.github.com/search/repositories?q=mario+language:kotlin&sort=stars&order=desc"
 
     if(isNetworkConnected()){
-      doAsync {
-        val result = Request().run()
-        uiThread {
-          repoList.adapter = RepoListAdapter(result)
-        }
-      }
+      repoRetriever.getRepositories(callback)
     } else {
       AlertDialog.Builder(this).setTitle("No Internet Connection")
               .setMessage("Please check your internet connection and try again")

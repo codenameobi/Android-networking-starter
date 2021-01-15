@@ -39,7 +39,7 @@ class Request {
   companion object {
     //1
     private const val URL = "https://api.github.com/search/repositories"
-    private const val SEARCH = "q=super+mario+language:kotlin&sort=stars&order=desc"
+    private const val SEARCH = "q=super+mario+language:kotlin&sort=stars&order=desc&?per_page=50"
     private const val COMPLETE_URL = "$URL?$SEARCH"
   }
 
