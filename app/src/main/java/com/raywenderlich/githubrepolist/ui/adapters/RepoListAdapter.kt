@@ -30,20 +30,43 @@
 
 package com.raywenderlich.githubrepolist.ui.adapters
 
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.raywenderlich.githubrepolist.R
+import com.raywenderlich.githubrepolist.data.Item
+import com.raywenderlich.githubrepolist.data.RepoResult
+import com.raywenderlich.githubrepolist.extensions.ctx
+import kotlinx.android.synthetic.main.item_repo.view.*
+
+class RepoListAdapter(private val repoList: RepoResult) : RecyclerView.Adapter<RepoListAdapter.ViewHolder>() {
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    //2
+    val view = LayoutInflater.from(parent.ctx).inflate(R.layout.item_repo, parent, false)
 
 
-class RepoListAdapter(private val items: List<String>) : RecyclerView.Adapter<RepoListAdapter.ViewHolder>() {
-
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(TextView(parent.context))
-
-  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    holder.textView.text = items[position]
+    return ViewHolder(view)
   }
 
-  override fun getItemCount(): Int = items.size
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    //3
+    holder.bindRepo(repoList.items[position])
+  }
 
-  class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+  //4
+  override fun getItemCount(): Int = repoList.items.size
+
+  class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    fun bindRepo(repo: Item) {
+
+      //5
+      itemView.username.text = repo.owner.login.orEmpty()
+      //6
+      itemView.repoName.text = repo.fullName.orEmpty()
+      //7
+      itemView.repoDescription.text = repo.description.orEmpty()
+    }
+  }
 }
