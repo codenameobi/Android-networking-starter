@@ -38,6 +38,7 @@ import com.raywenderlich.githubrepolist.R
 import com.raywenderlich.githubrepolist.data.Item
 import com.raywenderlich.githubrepolist.data.RepoResult
 import com.raywenderlich.githubrepolist.extensions.ctx
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_repo.view.*
 
 class RepoListAdapter(private val repoList: RepoResult) : RecyclerView.Adapter<RepoListAdapter.ViewHolder>() {
@@ -59,14 +60,16 @@ class RepoListAdapter(private val repoList: RepoResult) : RecyclerView.Adapter<R
   override fun getItemCount(): Int = repoList.items.size
 
   class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    //5
     fun bindRepo(repo: Item) {
-
-      //5
-      itemView.username.text = repo.owner.login.orEmpty()
-      //6
-      itemView.repoName.text = repo.fullName.orEmpty()
-      //7
-      itemView.repoDescription.text = repo.description.orEmpty()
+      with(repo) {
+        //6
+        itemView.username.text = owner.login.orEmpty()
+        //7
+        itemView.repoName.text = fullName.orEmpty()
+        itemView.repoDescription.text = description.orEmpty()
+        Picasso.get().load(owner.avatarUrl).into(itemView.icon)
+      }
     }
   }
 }
